@@ -1,5 +1,6 @@
 package com.jacquessmuts.hellothere
 
+import android.media.MediaPlayer
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -29,9 +30,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         //creating our adapter
-        val adapter = HelloThereAdapter(helloThereItems)
+        val adapter = HelloThereAdapter(helloThereItems, {sayHelloThere(it)})
 
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
+    }
+
+    private fun sayHelloThere(item : HelloThereItem){
+        //var resID = getResources().getIdentifier(anum.aSound, "raw", getPackageName())
+        val mediaPlayer = MediaPlayer.create(this, R.raw.hello_there);
+        mediaPlayer.start()
     }
 }
