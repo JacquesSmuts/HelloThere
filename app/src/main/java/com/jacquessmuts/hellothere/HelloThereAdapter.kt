@@ -4,16 +4,11 @@ package com.jacquessmuts.hellothere
  * Created by smuts on 12/15/2017.
  */
 
-import android.media.MediaPlayer
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import com.jacquessmuts.hellothere.data.HelloThereItem
-import com.squareup.picasso.Picasso
-import pl.droidsonroids.gif.GifImageView
 
 /**
  * Created by Belal on 6/19/2017.

@@ -19,11 +19,17 @@ class MainActivity : AppCompatActivity() {
         //adding a layoutmanager
         recyclerView.layoutManager = GridLayoutManager(this, 4)
 
+        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                sayHelloThere(HelloThereItem(0));
+            }
+        });
 
         //crating an arraylist to store users using the data class user
         val helloThereItems = ArrayList<HelloThereItem>()
 
-        var iterator = 0;
+        var iterator = 0
         while (iterator < 1000){
             helloThereItems.add(HelloThereItem(iterator))
             iterator++
@@ -35,10 +41,9 @@ class MainActivity : AppCompatActivity() {
         //now adding the adapter to recyclerview
         recyclerView.adapter = adapter
     }
-
     private fun sayHelloThere(item : HelloThereItem){
         //var resID = getResources().getIdentifier(anum.aSound, "raw", getPackageName())
-        val mediaPlayer = MediaPlayer.create(this, R.raw.hello_there);
+        val mediaPlayer = MediaPlayer.create(this, R.raw.hello_there)
         mediaPlayer.start()
     }
 }
