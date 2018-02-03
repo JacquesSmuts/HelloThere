@@ -13,14 +13,20 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.jacquessmuts.hellothere.data.HelloThereItem
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var exoPlayers: ArrayList<SimpleExoPlayer>
 
-    private val MAX_PLAYERS = 10
+    private val MAX_PLAYERS = 12
     private var mCurrentlySelectedExoPlayer = 0 //loops from 0-MAX_PLAYERS
+
+    val random = Random()
+    private var mHelloThereItems : ArrayList<HelloThereItem> = ArrayList()
+    private lateinit var mAdapter : HelloThereAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,42 +37,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(){
-        //getting recyclerview from xml
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-
         //adding a layoutmanager
-        recyclerView.layoutManager = GridLayoutManager(this, 4) as RecyclerView.LayoutManager?
+        recycler_view.layoutManager = GridLayoutManager(this, 4)
 
-        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener(){
+        recycler_view.addOnScrollListener(object: RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                sayHelloThere(HelloThereItem(0));
+                sayHelloThere(HelloThereItem(0))
             }
-        });
+        })
 
-        //crating an arraylist to store users using the data class user
-        val helloThereItems = ArrayList<HelloThereItem>()
+        addMoreKenobi()
+    }
 
-        var iterator = 0
-        while (iterator < 1000){
-            helloThereItems.add(HelloThereItem(iterator))
+    /**
+     * Add 1000 kenobi items
+     */
+    private fun addMoreKenobi(){
+        var iterator = mHelloThereItems.size
+        val initialSize = mHelloThereItems.size
+        while (iterator < initialSize+1000){
+            val helloThereItem = HelloThereItem(iterator)
+            if (rand(0, 1001) > 999){
+                helloThereItem.isGrievious = true
+            }
+            mHelloThereItems.add(helloThereItem)
             iterator++
         }
 
-        //creating our adapter
-        val adapter = HelloThereAdapter(helloThereItems, {sayHelloThere(it)})
+        mAdapter = HelloThereAdapter(mHelloThereItems, {sayHelloThere(it)})
+        recycler_view.adapter = mAdapter
+    }
 
-        //now adding the adapter to recyclerview
-        recyclerView.adapter = adapter
+    fun rand(from: Int, to: Int) : Int {
+        return random.nextInt(to - from) + from
     }
 
     private fun setupExoPlayer() {
         val trackSelector = DefaultTrackSelector()
 
-        exoPlayers = ArrayList()
+        this.exoPlayers = ArrayList()
         while (mCurrentlySelectedExoPlayer < MAX_PLAYERS) {
             exoPlayers.add(ExoPlayerFactory.newSimpleInstance(baseContext, trackSelector))
-            exoPlayers.get(mCurrentlySelectedExoPlayer).playWhenReady = true
+            exoPlayers[mCurrentlySelectedExoPlayer].playWhenReady = true
             mCurrentlySelectedExoPlayer++
         }
         mCurrentlySelectedExoPlayer = 0
@@ -75,14 +88,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun sayHelloThere(item : HelloThereItem){
 
-        val mediaUri = Uri.parse("asset:///hello_there.mp3")
+        var uriString = "asset:///hello_there.mp3"
+
+        if (item.isGrievious){
+            uriString = "asset:///general_kenobi.mp3"
+        }
+        val mediaUri = Uri.parse(uriString)
 
         val userAgent = Util.getUserAgent(baseContext, "ExoPlayer")
         val mediaSource = ExtractorMediaSource(mediaUri,
                 DefaultDataSourceFactory(baseContext, userAgent),
                 DefaultExtractorsFactory(), null, null)
 
-        val exoPlayer = exoPlayers.get(mCurrentlySelectedExoPlayer)
+        val exoPlayer = exoPlayers[mCurrentlySelectedExoPlayer]
 
         if (!exoPlayer.isLoading &&
                 (exoPlayer.playbackState == SimpleExoPlayer.STATE_IDLE ||
@@ -104,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         mCurrentlySelectedExoPlayer = 0
 
         while (mCurrentlySelectedExoPlayer < MAX_PLAYERS) {
-            exoPlayers.get(mCurrentlySelectedExoPlayer).release()
+            exoPlayers[mCurrentlySelectedExoPlayer].release()
             mCurrentlySelectedExoPlayer++
         }
         mCurrentlySelectedExoPlayer = 0

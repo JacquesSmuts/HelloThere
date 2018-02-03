@@ -1,25 +1,21 @@
 package com.jacquessmuts.hellothere
 
 /**
- * Created by smuts on 12/15/2017.
- */
+* Created by Jacques Smuts on 12/15/2017.
+*/
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.jacquessmuts.hellothere.data.HelloThereItem
-
-/**
- * Created by Belal on 6/19/2017.
- */
+import pl.droidsonroids.gif.GifImageView
 
 class HelloThereAdapter(val helloThereList: ArrayList<HelloThereItem>,
                         val itemClick: (HelloThereItem) -> Unit) :
                         RecyclerView.Adapter<HelloThereAdapter.ViewHolder>() {
 
     companion object {
-        const val HELLO_THERE_URL = "https://vignette.wikia.nocookie.net/dbz-dokkanbattle/images/d/d7/Hello_there.gif/revision/latest?cb=20170920015241";
     }
 
     //this method is returning the view for each item in the list
@@ -31,6 +27,13 @@ class HelloThereAdapter(val helloThereList: ArrayList<HelloThereItem>,
     //this method is binding the data on the list
     override fun onBindViewHolder(holder: HelloThereAdapter.ViewHolder, position: Int) {
         holder.bindItems(helloThereList[position])
+
+        var imageResource = R.drawable.hello_there
+        if (helloThereList[position].isGrievious){
+            imageResource = R.drawable.general
+        }
+
+        holder.imageView.setImageResource(imageResource)
     }
 
     //this method is giving the size of the list
@@ -40,6 +43,8 @@ class HelloThereAdapter(val helloThereList: ArrayList<HelloThereItem>,
 
     //the class is hodling the list view
     class ViewHolder(itemView: View, private val itemClick: (HelloThereItem) -> Unit) : RecyclerView.ViewHolder(itemView) {
+
+        var imageView : GifImageView = itemView.findViewById(R.id.image_hello_there)
 
         fun bindItems(item: HelloThereItem) {
 //            val imageViewHelloThere = itemView.findViewById<GifImageView>(R.id.image_hello_there)
