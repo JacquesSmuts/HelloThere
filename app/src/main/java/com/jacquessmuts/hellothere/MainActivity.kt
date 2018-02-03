@@ -43,6 +43,11 @@ class MainActivity : AppCompatActivity() {
         recycler_view.addOnScrollListener(object: RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+
+                val gridLayoutManager : GridLayoutManager = recyclerView!!.layoutManager as GridLayoutManager
+                if (gridLayoutManager.findLastVisibleItemPosition() > mHelloThereItems.size - 10){
+                    addMoreKenobi()
+                }
                 sayHelloThere(HelloThereItem(0))
             }
         })
