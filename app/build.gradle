@@ -10,8 +10,8 @@ android {
         applicationId "com.jacquessmuts.hellothere"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 10 //git rev-list --count [revision]
-        versionName "1.hellothere.1"
+        versionCode 15 //git rev-list --count [revision]
+        versionName "1.general.kenobi"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

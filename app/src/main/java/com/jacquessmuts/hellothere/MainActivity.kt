@@ -1,10 +1,13 @@
 package com.jacquessmuts.hellothere
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.Menu
+import android.view.MenuItem
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
@@ -21,12 +24,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var exoPlayers: ArrayList<SimpleExoPlayer>
 
-    private val MAX_PLAYERS = 12
+    private val MAX_PLAYERS = 10
     private var mCurrentlySelectedExoPlayer = 0 //loops from 0-MAX_PLAYERS
 
     val random = Random()
     private var mHelloThereItems : ArrayList<HelloThereItem> = ArrayList()
     private lateinit var mAdapter : HelloThereAdapter
+
+//    private lateinit var mShareActionProvider : ShareActionProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +39,21 @@ class MainActivity : AppCompatActivity() {
 
         setupExoPlayer()
         setupRecyclerView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_home, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.getItemId()) {
+            R.id.menu_item_share -> {
+                shareApp()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setupRecyclerView(){
@@ -123,6 +143,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun shareApp(){
+        val sharingIntent = Intent(android.content.Intent.ACTION_SEND)
+        sharingIntent.type = "text/plain"
+        val shareBody = getString(R.string.share_text)
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.app_name))
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody)
+        startActivity(sharingIntent)
+    }
     override fun onDestroy() {
         mCurrentlySelectedExoPlayer = 0
 
