@@ -24,10 +24,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var exoPlayers: ArrayList<SimpleExoPlayer>
 
-    private val MAX_PLAYERS = 10
-    private var mCurrentlySelectedExoPlayer = 0 //loops from 0-MAX_PLAYERS
+    private val maxPlayers = 10
+    private var mCurrentlySelectedExoPlayer = 0 //loops from 0-maxPlayers
 
-    val random = Random()
+    private val random = Random()
     private var mHelloThereItems : ArrayList<HelloThereItem> = ArrayList()
     private lateinit var mAdapter : HelloThereAdapter
 
@@ -47,12 +47,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.getItemId()) {
+        return when (item.getItemId()) {
             R.id.menu_item_share -> {
                 shareApp()
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         recycler_view.adapter = mAdapter
     }
 
-    fun rand(from: Int, to: Int) : Int {
+    private fun rand(from: Int, to: Int) : Int {
         return random.nextInt(to - from) + from
     }
 
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         val trackSelector = DefaultTrackSelector()
 
         this.exoPlayers = ArrayList()
-        while (mCurrentlySelectedExoPlayer < MAX_PLAYERS) {
+        while (mCurrentlySelectedExoPlayer < maxPlayers) {
             exoPlayers.add(ExoPlayerFactory.newSimpleInstance(baseContext, trackSelector))
             exoPlayers[mCurrentlySelectedExoPlayer].playWhenReady = true
             mCurrentlySelectedExoPlayer++
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun iterateExoPlayer(){
         mCurrentlySelectedExoPlayer++
-        if (mCurrentlySelectedExoPlayer > MAX_PLAYERS-1){
+        if (mCurrentlySelectedExoPlayer > maxPlayers -1){
             mCurrentlySelectedExoPlayer = 0
         }
     }
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         mCurrentlySelectedExoPlayer = 0
 
-        while (mCurrentlySelectedExoPlayer < MAX_PLAYERS) {
+        while (mCurrentlySelectedExoPlayer < maxPlayers) {
             exoPlayers[mCurrentlySelectedExoPlayer].release()
             mCurrentlySelectedExoPlayer++
         }

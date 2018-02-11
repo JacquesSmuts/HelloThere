@@ -5,13 +5,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.jacquessmuts.hellothere"
         minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 15 //git rev-list --count [revision]
-        versionName "1.general.kenobi"
+        targetSdkVersion 27
+        versionCode 16 //git rev-list --count [revision]
+        versionName "1.hello.general"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,7 +30,7 @@ android {
     }
 }
 ext {
-    supportLibraryVersion = "26.1.0"
+    supportLibraryVersion = "27.0.2"
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
