@@ -1,5 +1,7 @@
 package com.jacquessmuts.hellothere
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -24,10 +26,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var exoPlayers: ArrayList<SimpleExoPlayer>
 
-    private val maxPlayers = 10
-    private var mCurrentlySelectedExoPlayer = 0 //loops from 0-maxPlayers
+    private var mMaxPlayers = 10
+    private var mColumnCount = 4;
+    private var mCurrentlySelectedExoPlayer = 0 //loops from 0-mMaxPlayers
 
-    private val random = Random()
     private var mHelloThereItems : ArrayList<HelloThereItem> = ArrayList()
     private lateinit var mAdapter : HelloThereAdapter
 
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        determineDevicePower()
         setupExoPlayer()
         setupRecyclerView()
     }
@@ -58,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupRecyclerView(){
         //adding a layoutmanager
-        recycler_view.layoutManager = GridLayoutManager(this, 4)
+        recycler_view.layoutManager = GridLayoutManager(this, mColumnCount)
 
         recycler_view.addOnScrollListener(object: RecyclerView.OnScrollListener(){
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
@@ -95,14 +98,45 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rand(from: Int, to: Int) : Int {
-        return random.nextInt(to - from) + from
+        return Random().nextInt(to - from) + from
+    }
+
+    /**
+     * Determine whether this device is slow, medium or fast, for memory usage reasons
+     */
+    private fun determineDevicePower(){
+        val actManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val memInfo = ActivityManager.MemoryInfo()
+        actManager.getMemoryInfo(memInfo)
+        val totalMemory = memInfo.totalMem / (1024 * 1024);
+
+        //if the memory is smallish
+        when (totalMemory){
+            in 0..3000-> { //slow
+                mColumnCount = 4
+                mMaxPlayers = 6
+            }
+            in 3001..4000 -> { //normal
+                mColumnCount = 4
+                mMaxPlayers = 10
+            }
+            else -> { //fast
+                mColumnCount = 5
+                mMaxPlayers = 12
+            }
+        }
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+            //if the phone is old-ish
+            mColumnCount = 4
+            mMaxPlayers = 6
+        }
     }
 
     private fun setupExoPlayer() {
         val trackSelector = DefaultTrackSelector()
 
         this.exoPlayers = ArrayList()
-        while (mCurrentlySelectedExoPlayer < maxPlayers) {
+        while (mCurrentlySelectedExoPlayer < mMaxPlayers) {
             exoPlayers.add(ExoPlayerFactory.newSimpleInstance(baseContext, trackSelector))
             exoPlayers[mCurrentlySelectedExoPlayer].playWhenReady = true
             mCurrentlySelectedExoPlayer++
@@ -138,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun iterateExoPlayer(){
         mCurrentlySelectedExoPlayer++
-        if (mCurrentlySelectedExoPlayer > maxPlayers -1){
+        if (mCurrentlySelectedExoPlayer > mMaxPlayers -1){
             mCurrentlySelectedExoPlayer = 0
         }
     }
@@ -155,7 +189,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         mCurrentlySelectedExoPlayer = 0
 
-        while (mCurrentlySelectedExoPlayer < maxPlayers) {
+        while (mCurrentlySelectedExoPlayer < mMaxPlayers) {
             exoPlayers[mCurrentlySelectedExoPlayer].release()
             mCurrentlySelectedExoPlayer++
         }

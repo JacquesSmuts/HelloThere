@@ -19,10 +19,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationIdSuffix ".dev" //required to keep debug crashes from spoiling analytics
+        }
     }
     signingConfigs {
         release {
             storeFile file("hellothere.jks")
+            //normally you'd keep passwords in a file in .gitignore, but for this project I don't care
             storePassword "hellothere"
             keyAlias "generalkenobi"
             keyPassword "hellothere"
