@@ -3,6 +3,7 @@ package com.jacquessmuts.hellothere
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -20,15 +21,18 @@ import com.google.android.exoplayer2.util.Util
 import com.jacquessmuts.hellothere.data.HelloThereItem
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var exoPlayers: ArrayList<SimpleExoPlayer>
+    private lateinit var mExoPlayers: ArrayList<SimpleExoPlayer>
+    private lateinit var mMediaPlayers: ArrayList<MediaPlayer>
+    private var mIsOldPhone = false
 
     private var mMaxPlayers = 10
     private var mColumnCount = 4;
-    private var mCurrentlySelectedExoPlayer = 0 //loops from 0-mMaxPlayers
+    private var mCurrentlySelectedPlayer = 0 //loops from 0-mMaxPlayers
 
     private var mHelloThereItems : ArrayList<HelloThereItem> = ArrayList()
     private lateinit var mAdapter : HelloThereAdapter
@@ -40,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         determineDevicePower()
-        setupExoPlayer()
+        setupPlayer()
         setupRecyclerView()
     }
 
@@ -93,7 +97,7 @@ class MainActivity : AppCompatActivity() {
             iterator++
         }
 
-        mAdapter = HelloThereAdapter(mHelloThereItems, {sayHelloThere(it)})
+        mAdapter = HelloThereAdapter(mHelloThereItems, { sayHelloThere(it)})
         recycler_view.adapter = mAdapter
     }
 
@@ -115,6 +119,7 @@ class MainActivity : AppCompatActivity() {
             in 0..3000-> { //slow
                 mColumnCount = 4
                 mMaxPlayers = 6
+                mIsOldPhone = true
             }
             in 3001..4000 -> { //normal
                 mColumnCount = 4
@@ -125,27 +130,62 @@ class MainActivity : AppCompatActivity() {
                 mMaxPlayers = 12
             }
         }
-        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
             //if the phone is old-ish
             mColumnCount = 4
             mMaxPlayers = 6
+            mIsOldPhone = true
+        }
+    }
+
+    private fun setupPlayer(){
+        if (mIsOldPhone){
+            setupMediaPlayer()
+        } else {
+            setupExoPlayer()
         }
     }
 
     private fun setupExoPlayer() {
         val trackSelector = DefaultTrackSelector()
 
-        this.exoPlayers = ArrayList()
-        while (mCurrentlySelectedExoPlayer < mMaxPlayers) {
-            exoPlayers.add(ExoPlayerFactory.newSimpleInstance(baseContext, trackSelector))
-            exoPlayers[mCurrentlySelectedExoPlayer].playWhenReady = true
-            mCurrentlySelectedExoPlayer++
+        this.mExoPlayers = ArrayList()
+        while (mCurrentlySelectedPlayer < mMaxPlayers) {
+            mExoPlayers.add(ExoPlayerFactory.newSimpleInstance(baseContext, trackSelector))
+            mExoPlayers[mCurrentlySelectedPlayer].playWhenReady = true
+            mCurrentlySelectedPlayer++
         }
-        mCurrentlySelectedExoPlayer = 0
+        mCurrentlySelectedPlayer = 0
     }
 
+    private fun setupMediaPlayer() {
+        this.mMediaPlayers = ArrayList()
+        while (mCurrentlySelectedPlayer < mMaxPlayers) {
+            mMediaPlayers.add(MediaPlayer.create(this, R.raw.hello_there))
+            mCurrentlySelectedPlayer++
+        }
+        mCurrentlySelectedPlayer = 0
+    }
 
     private fun sayHelloThere(item : HelloThereItem){
+        if (mIsOldPhone){
+            sayHelloThereMedia()
+        } else {
+            sayHelloThereExo(item)
+        }
+    }
+
+    private fun sayHelloThereMedia(){
+
+        val mediaPlayer = mMediaPlayers[mCurrentlySelectedPlayer]
+        if (!mediaPlayer.isPlaying){
+            mMediaPlayers[mCurrentlySelectedPlayer] = MediaPlayer.create(this, R.raw.hello_there)
+            mMediaPlayers[mCurrentlySelectedPlayer].start()
+        }
+        iteratePlayer()
+    }
+
+    private fun sayHelloThereExo(item : HelloThereItem){
 
         var uriString = "asset:///hello_there.mp3"
 
@@ -159,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                 DefaultDataSourceFactory(baseContext, userAgent),
                 DefaultExtractorsFactory(), null, null)
 
-        val exoPlayer = exoPlayers[mCurrentlySelectedExoPlayer]
+        val exoPlayer = mExoPlayers[mCurrentlySelectedPlayer]
 
         if (!exoPlayer.isLoading &&
                 (exoPlayer.playbackState == SimpleExoPlayer.STATE_IDLE ||
@@ -167,13 +207,13 @@ class MainActivity : AppCompatActivity() {
             exoPlayer.prepare(mediaSource)
         }
 
-        iterateExoPlayer()
+        iteratePlayer()
     }
 
-    private fun iterateExoPlayer(){
-        mCurrentlySelectedExoPlayer++
-        if (mCurrentlySelectedExoPlayer > mMaxPlayers -1){
-            mCurrentlySelectedExoPlayer = 0
+    private fun iteratePlayer(){
+        mCurrentlySelectedPlayer++
+        if (mCurrentlySelectedPlayer > mMaxPlayers -1){
+            mCurrentlySelectedPlayer = 0
         }
     }
 
@@ -187,14 +227,14 @@ class MainActivity : AppCompatActivity() {
         startActivity(sharingIntent)
     }
     override fun onDestroy() {
-        mCurrentlySelectedExoPlayer = 0
+        mCurrentlySelectedPlayer = 0
 
-        while (mCurrentlySelectedExoPlayer < mMaxPlayers) {
-            exoPlayers[mCurrentlySelectedExoPlayer].release()
-            mCurrentlySelectedExoPlayer++
+        while (mCurrentlySelectedPlayer < mMaxPlayers) {
+            mExoPlayers[mCurrentlySelectedPlayer].release()
+            mCurrentlySelectedPlayer++
         }
-        mCurrentlySelectedExoPlayer = 0
-        exoPlayers = ArrayList()
+        mCurrentlySelectedPlayer = 0
+        mExoPlayers = ArrayList()
 
         super.onDestroy()
     }
