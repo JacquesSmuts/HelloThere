@@ -23,6 +23,17 @@ android {
             applicationIdSuffix ".dev" //required to keep debug crashes from spoiling analytics
         }
     }
+    flavorDimensions "meme"
+    productFlavors {
+        hellothere {
+            applicationId "com.jacquessmuts.hellothere"
+            dimension "meme"
+        }
+        dewit {
+            applicationId "com.jacquessmuts.dewit"
+            dimension "meme"
+        }
+    }
     signingConfigs {
         release {
             storeFile file("hellothere.jks")

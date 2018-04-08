@@ -147,10 +147,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun sayHelloThere(item : HelloThereItem){
 
-        var uriString = "asset:///hello_there.mp3"
+        var uriString = "asset:///soundbite1.mp3"
 
         if (item.isGrievious){
-            uriString = "asset:///general_kenobi.mp3"
+            uriString = "asset:///soundbite2.mp3"
         }
         val mediaUri = Uri.parse(uriString)
 

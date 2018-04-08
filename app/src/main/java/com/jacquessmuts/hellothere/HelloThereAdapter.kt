@@ -28,9 +28,9 @@ class HelloThereAdapter(val helloThereList: ArrayList<HelloThereItem>,
     override fun onBindViewHolder(holder: HelloThereAdapter.ViewHolder, position: Int) {
         holder.bindItems(helloThereList[position])
 
-        var imageResource = R.drawable.hello_there
+        var imageResource = R.drawable.maingif
         if (helloThereList[position].isGrievious){
-            imageResource = R.drawable.general
+            imageResource = R.drawable.secondgif
         }
 
         holder.imageView.setImageResource(imageResource)

@@ -10,6 +10,6 @@
         android:layout_width="120dp"
         android:layout_height="100dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/hello_there"/>
+        android:src="@drawable/maingif"/>
 
 </android.support.constraint.ConstraintLayout>
